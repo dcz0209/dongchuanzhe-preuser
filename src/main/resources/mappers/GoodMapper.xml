@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dongchuanzhe.preuser.mapper.GoodMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dongchuanzhe.preuser.entity.Good">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="image" property="image" />
+        <result column="price" property="price" />
+        <result column="created" property="create" />
+        <result column="province" property="province" />
+        <result column="city" property="city" />
+        <result column="district" property="district" />
+    </resultMap>
+    <resultMap id="GoodsVOMap" type="com.dongchuanzhe.preuser.entity.GoodsVO" extends="BaseResultMap">
+        <result column="provinceName" property="provinceName" />
+        <result column="cityName" property="cityName" />
+        <result column="districtName" property="districtName" />
+        <result column="sids" property="sids" />
+        <result column="snames" property="snames" />
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, image, price, create, province, city, district
+    </sql>
+
+    <select id="goodsList" resultMap="GoodsVOMap">
+        select g.*,
+         p.province provinceName,
+        if(c.city='',p.province,c.city) cityName,
+        if(d.district='',c.city,d.district) districtName,
+        group_concat(s.id) sids,
+        group_concat(s.name) snames
+
+        from lx_good g
+        left join lx_goods_sales gs on g.id = gs.gid
+        left join lx_sales s on gs.sid = s.id
+        left join nation p 	on g.province = p.id
+        left join nation c on g.city = c.id
+        left join nation d on g.district = d.id
+        group by g.id
+    </select>
+</mapper>

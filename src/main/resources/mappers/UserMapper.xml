@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dongchuanzhe.preuser.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dongchuanzhe.preuser.entity.User">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="phone" property="phone" />
+        <result column="telephone" property="telephone" />
+        <result column="address" property="address" />
+        <result column="enabled" property="enabled" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="userface" property="userface" />
+        <result column="remark" property="remark" />
+        <result column="sex" property="sex" />
+        <result column="province" property="province" />
+        <result column="city" property="city" />
+        <result column="district" property="district" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, phone, telephone, address, enabled, username, password, userface, remark, sex, province, city, district
+    </sql>
+
+    <resultMap id="BaseVo" type="com.dongchuanzhe.preuser.entity.UserVO" extends="BaseResultMap">
+        <result column="provinceName" property="provinceName" />
+        <result column="cityName" property="cityName" />
+        <result column="districtName" property="districtName" />
+        <result column="roleIds" property="roleIds" />
+        <result column="roleNameZhs" property="roleNameZhs" />
+    </resultMap>
+    <select id="userList" resultMap="BaseVo">
+select
+u.*,p.province provinceName,
+if(c.city='',p.province,c.city) cityName,
+if(d.district='',c.city,d.district) districtName,
+group_concat(r.id) roleIds,
+group_concat(r.nameZh) roleNameZhs
+from  `user`  u
+left join nation p 	on u.province = p.id
+left join nation c on u.city = c.id
+left join nation d on u.district = d.id
+left join user_role ur on ur.uid = u.id
+left join role r on ur.rid = r.id
+<where>
+    <if test="userVO != null">
+        <if test="userVO.name != null and userVO.name != ''">
+            and u.name like concat('%',#{userVO.name},'%')
+
+        </if>
+    </if>
+</where>
+group by u.id
+    </select>
+</mapper>

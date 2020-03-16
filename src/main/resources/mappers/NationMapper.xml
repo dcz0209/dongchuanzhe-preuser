@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dongchuanzhe.preuser.mapper.NationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dongchuanzhe.preuser.entity.Nation">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="province" property="province" />
+        <result column="city" property="city" />
+        <result column="district" property="district" />
+        <result column="parent" property="parent" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, code, province, city, district, parent
+    </sql>
+
+    <resultMap id="BaseVo" type="com.dongchuanzhe.preuser.entity.NationVO">
+        <id column="id" property="value"/>
+        <result column="province" property="label"/>
+        <collection property="children" ofType="com.dongchuanzhe.preuser.entity.NationVO">
+            <id column="cid" property="value"/>
+            <result column="city" property="label"/>
+            <collection property="children" ofType="com.dongchuanzhe.preuser.entity.NationVO">
+                <id column="did" property="value"/>
+                <result column="district" property="label"/>
+            </collection>
+        </collection>
+
+    </resultMap>
+    <select id="findAll" resultMap="BaseVo">
+        select p.id,p.province,
+        if(c.city='',p.id,c.id) cid,if(c.city='',p.province,c.city) city,
+        IFNULL(d.id,c.id) did ,IFNULL(d.district,c.district) district
+
+        from nation p
+        left join nation c on p.id = c.parent
+        left join nation d on c.id = d.parent
+
+        where p.parent = 1
+    </select>
+</mapper>

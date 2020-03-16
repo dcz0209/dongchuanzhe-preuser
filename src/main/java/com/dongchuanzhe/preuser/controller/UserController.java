@@ -31,7 +31,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
+    /**
+     * userserive github 测试
+     */
     @Resource
     private IUserService service;
 
